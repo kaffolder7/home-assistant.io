@@ -45,16 +45,31 @@ Play Media Application ID:
 
 The Roku integration polls every 10 seconds to check the current state of media playback. The available applications and television channels are only fetched every 15 minutes.
 
-There is currently support for the following device types within Home Assistant:
+## Supported functionality
 
-- Media player
-- Remote
+### Entities
 
-## Remote
+The Roku integration provides the following entities.
 
-The remote platform allows you to send remote control buttons to a Roku device. It is automatically set up when a Roku is configured.
+#### Binary sensor
 
-At the moment, the following buttons are supported:
+- **Headphones connected sensor**
+  - **Description**: The headphones connected sensor will tell if you if the device has headphones connected for private listening.
+
+- **Supports AirPlay sensor**
+  - **Description**: The supports AirPlay sensor will tell if you if the device is capable of accepting AirPlay connections.
+
+- **Supports ethernet sensor**
+  - **Description**: The supports ethernet sensor will tell if you if the device is capable of being connected via an ethernet cable.
+
+- **Supports find remote sensor**
+  - **Description**: The supports find remote sensor will tell if you if the device is capable of the find remote feature.
+
+#### Remote
+
+The integration allows you to send remote control commands to a Roku device. It is automatically set up when a Roku is configured.
+
+The following commands are currently supported:
 
 - back
 - backspace
@@ -99,12 +114,23 @@ data:
     - select
 ```
 
-## Media player
+#### Media player
 
-When the integration is enabled and a Roku device has been configured, in the Home Assistant UI the Roku media player will show a listing of the installed channels, or apps, under “source”. Select one and it will attempt to launch the channel on your Roku device.
+The integration allows for media playback control including power and source control.
 
+#### Select
 
-### Source Automation
+- **Application select**
+  - **Description**: The application select control will allow changing the active application.
+
+- **Channel select**
+  - **Description**: The channel select control will allow changing the active channel.
+
+#### Sensor
+
+TBD
+
+## Source Automation
 
 The `media_player.select_source` action may be used to launch specific applications/streaming channels on your Roku device.
 
@@ -113,7 +139,7 @@ The `media_player.select_source` action may be used to launch specific applicati
 | `entity_id` | no | Target a specific media player. | 
 | `source` | no | An application name or application ID. | Prime Video
 
-#### Examples
+### Examples
 
 ```yaml
 actions:
@@ -135,13 +161,13 @@ actions:
       source: 20197
 ```
 
-#### Obtaining Application IDs
+### Obtaining Application IDs
 
 The currently active application ID can be found in the `Active App ID` diagnostic sensor.
 
 Alternatively, you can make a manual HTTP request (GET) to `http://ROKU_IP:8060/query/apps`, in either your browser or terminal, to retrieve a complete list of installed applications in XML format.
 
-### TV Channel Tuning
+## TV Channel Tuning
 
 The `media_player.play_media` action may be used to tune to specific channels on your Roku TV device with OTA antenna.
 
@@ -151,7 +177,7 @@ The `media_player.play_media` action may be used to tune to specific channels on
 | `media_content_id` | no | A channel number. | 5.1
 | `media_content_type` | no | A media type. | `channel`
 
-#### Example
+### Example
 
 ```yaml
 actions:
@@ -163,7 +189,7 @@ actions:
       media_content_type: channel
 ```
 
-### Play on Roku
+## Play on Roku
 
 The `media_player.play_media` action may be used to send media URLs (primarily videos) for direct playback on your device.
 
@@ -183,7 +209,7 @@ The following third-party applications have been tested with this integration:
 | `extra.thumbnail` | yes | A thumbnail URL for the media. | 
 | `extra.artist_name` | yes | The name of the media artist. | Blender
 
-#### Example
+### Example
 ```yaml
 actions:
   - action: media_player.play_media
@@ -197,7 +223,7 @@ actions:
         name: "Big Buck Bunny"
 ```
 
-### Content Deeplinking
+## Content Deeplinking
 
 The `media_player.play_media` action may be used to deep-link to content within a channel application.
 
@@ -209,7 +235,7 @@ The `media_player.play_media` action may be used to deep-link to content within 
 | `extra.content_id` | no | A unique content identifier passed to app. | 8e06a8b7-d667-4e31-939d-f40a6dd78a88
 | `extra.media_type` | no | A media type passed to app. Should be one of `movie`, `episode`, `season`, `series`, `shortFormVideo`, `special`, `live` | movie
 
-#### Example
+### Example
 
 ```yaml
 actions:
@@ -224,7 +250,7 @@ actions:
         media_type: movie
 ```
 
-#### Obtaining Content IDs
+### Obtaining Content IDs
 
 Content IDs are unique to each streaming service and vary in format but are often part of the video webpage URL. Here are some examples:
 
@@ -249,9 +275,9 @@ actions:
       media_player: media_player.roku
 ```
 
-## Actions
+## Additional Actions
 
-The integration exposes actions to give additional control over a Roku device.
+The integration exposes additional actions to control a Roku device.
 
 ### Action `roku.search`
 
