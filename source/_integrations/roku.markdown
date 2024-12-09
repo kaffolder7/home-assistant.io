@@ -26,13 +26,24 @@ ha_platforms:
 ha_integration_type: device
 ---
 
-The Roku integration allows you to control a [Roku](https://www.roku.com/) device.
+The Roku integration allows you to control a [Roku](https://www.roku.com/) media playback device.
 
 {% include integrations/config_flow.md %}
 
 When adding the integration, you will be asked to provide a {% term host %}. Unless you changed the hostname, this refers to the IP address of your Roku device. You can find the IP address or hostname in the network settings of your Roku device, by checking your router, or by using a network scanning tool.
 
 If you are having issues connecting, you may have to adjust the settings on your Roku device to allow local control. The common setting is: `Settings / System / Advanced / Control by mobile apps / Network access`
+
+{% include integrations/option_flow.md %}
+
+{% configuration_basic %}
+Play Media Application ID:
+  description: The application ID to use when launching media playback. The default is `15985`. This application must support the PlayOnRoku API.
+{% endconfiguration_basic %}
+
+## Data updates
+
+The Roku integration polls every 10 seconds to check the current state of media playback. The available applications and television channels are only fetched every 15 minutes.
 
 There is currently support for the following device types within Home Assistant:
 
@@ -41,7 +52,7 @@ There is currently support for the following device types within Home Assistant:
 
 ## Remote
 
-The `roku` remote platform allows you to send remote control buttons to a Roku device. It is automatically set up when a Roku is configured.
+The remote platform allows you to send remote control buttons to a Roku device. It is automatically set up when a Roku is configured.
 
 At the moment, the following buttons are supported:
 
@@ -90,16 +101,10 @@ data:
 
 ## Media player
 
-When the Home Assistant Roku integration is enabled and a Roku device has been configured, in the Home Assistant UI the Roku media player will show a listing of the installed channels, or apps, under “source”. Select one and it will attempt to launch the channel on your Roku device.
+When the integration is enabled and a Roku device has been configured, in the Home Assistant UI the Roku media player will show a listing of the installed channels, or apps, under “source”. Select one and it will attempt to launch the channel on your Roku device.
 
-{% include integrations/option_flow.md %}
 
-{% configuration_basic %}
-Play Media Application ID:
-  description: The application ID to use when launching media playback. This application must support the PlayOnRoku API.
-{% endconfiguration_basic %}
-
-## Source Automation
+### Source Automation
 
 The `media_player.select_source` action may be used to launch specific applications/streaming channels on your Roku device.
 
@@ -108,7 +113,7 @@ The `media_player.select_source` action may be used to launch specific applicati
 | `entity_id` | no | Target a specific media player. | 
 | `source` | no | An application name or application ID. | Prime Video
 
-### Examples
+#### Examples
 
 ```yaml
 actions:
@@ -130,13 +135,13 @@ actions:
       source: 20197
 ```
 
-### Obtaining Application IDs
+#### Obtaining Application IDs
 
 The currently active application ID can be found in the `Active App ID` diagnostic sensor.
 
 Alternatively, you can make a manual HTTP request (GET) to `http://ROKU_IP:8060/query/apps`, in either your browser or terminal, to retrieve a complete list of installed applications in XML format.
 
-## TV Channel Tuning
+### TV Channel Tuning
 
 The `media_player.play_media` action may be used to tune to specific channels on your Roku TV device with OTA antenna.
 
@@ -146,7 +151,7 @@ The `media_player.play_media` action may be used to tune to specific channels on
 | `media_content_id` | no | A channel number. | 5.1
 | `media_content_type` | no | A media type. | `channel`
 
-### Example
+#### Example
 
 ```yaml
 actions:
@@ -158,11 +163,11 @@ actions:
       media_content_type: channel
 ```
 
-## Play on Roku
+### Play on Roku
 
 The `media_player.play_media` action may be used to send media URLs (primarily videos) for direct playback on your device.
 
-This feature makes use of the PlayOnRoku API. If you are using an older Roku OS (pre-11.5), the defaults of this integration should just work. Alternatively, you can configure a third-party application that supports the PlayOnRoku API via the `Play Media Roku Application ID` option.
+This feature makes use of the PlayOnRoku API. If you are using an older Roku OS (pre-11.5), the defaults of this integration should just work with the configuration defaults. Alternatively, you can configure a third-party application that supports the PlayOnRoku API via the `Play Media Roku Application ID` option.
 
 The following third-party applications have been tested with this integration:
 
@@ -178,7 +183,7 @@ The following third-party applications have been tested with this integration:
 | `extra.thumbnail` | yes | A thumbnail URL for the media. | 
 | `extra.artist_name` | yes | The name of the media artist. | Blender
 
-### Example
+#### Example
 ```yaml
 actions:
   - action: media_player.play_media
@@ -191,6 +196,44 @@ actions:
         format: "mp4"
         name: "Big Buck Bunny"
 ```
+
+### Content Deeplinking
+
+The `media_player.play_media` action may be used to deep-link to content within a channel application.
+
+| Data attribute | Optional | Description | Example |
+| ---------------------- | -------- | ----------- | ------- |
+| `entity_id` | no | Target a specific media player. | 
+| `media_content_id` | no | A media identifier. | 291097
+| `media_content_type` | no | A media type. | `app`
+| `extra.content_id` | no | A unique content identifier passed to app. | 8e06a8b7-d667-4e31-939d-f40a6dd78a88
+| `extra.media_type` | no | A media type passed to app. Should be one of `movie`, `episode`, `season`, `series`, `shortFormVideo`, `special`, `live` | movie
+
+#### Example
+
+```yaml
+actions:
+  - action: media_player.play_media
+    target:
+      entity_id: media_player.roku
+    data:
+      media_content_id: 291097
+      media_content_type: app
+      extra:
+        content_id: 8e06a8b7-d667-4e31-939d-f40a6dd78a88
+        media_type: movie
+```
+
+#### Obtaining Content IDs
+
+Content IDs are unique to each streaming service and vary in format but are often part of the video webpage URL. Here are some examples:
+
+| Service | App ID | URL Format | Content ID | Media Type
+| ------- | ------ | ---------- | ---------- | ---------- |
+| Disney Plus | 291097 | disneyplus.com/video/8e06a8b7-d667-4e31-939d-f40a6dd78a88 | 8e06a8b7-d667-4e31-939d-f40a6dd78a88 | movie
+| Hulu | 2285 | hulu.com/series/american-dad-977c8e25-cde0-41b7-80ce-e746f2d2093f | american-dad-977c8e25-cde0-41b7-80ce-e746f2d2093f | series
+| Spotify | 22297 | open.spotify.com/playlist/5xddIVAtLrZKtt4YGLM1SQ | spotify:playlist:5xddIVAtLrZKtt4YGLM1SQ | playlist
+| YouTube | 837 | youtu.be/6ZMXE5PXPqU | 6ZMXE5PXPqU | live
 
 ## Camera Stream Integration
 
@@ -206,45 +249,9 @@ actions:
       media_player: media_player.roku
 ```
 
-## Content Deeplinking
-
-The `media_player.play_media` action may be used to deep-link to content within an application.
-
-| Data attribute | Optional | Description | Example |
-| ---------------------- | -------- | ----------- | ------- |
-| `entity_id` | no | Target a specific media player. | 
-| `media_content_id` | no | A media identifier. | 291097
-| `media_content_type` | no | A media type. | `app`
-| `extra.content_id` | no | A unique content identifier passed to app. | 8e06a8b7-d667-4e31-939d-f40a6dd78a88
-| `extra.media_type` | no | A media type passed to app. Should be one of `movie`, `episode`, `season`, `series`, `shortFormVideo`, `special`, `live` | movie
-
-### Example
-
-```yaml
-actions:
-  - action: media_player.play_media
-    target:
-      entity_id: media_player.roku
-    data:
-      media_content_id: 291097
-      media_content_type: app
-      extra:
-        content_id: 8e06a8b7-d667-4e31-939d-f40a6dd78a88
-        media_type: movie
-```
-
-### Obtaining Content IDs
-
-Content IDs are unique to each streaming service and vary in format but are often part of the video webpage URL. Here are some examples:
-
-| Service | App ID | URL Format | Content ID | Media Type
-| ------- | ------ | ---------- | ---------- | ---------- |
-| Disney Plus | 291097 | disneyplus.com/video/8e06a8b7-d667-4e31-939d-f40a6dd78a88 | 8e06a8b7-d667-4e31-939d-f40a6dd78a88 | movie
-| Hulu | 2285 | hulu.com/series/american-dad-977c8e25-cde0-41b7-80ce-e746f2d2093f | american-dad-977c8e25-cde0-41b7-80ce-e746f2d2093f | series
-| Spotify | 22297 | open.spotify.com/playlist/5xddIVAtLrZKtt4YGLM1SQ | spotify:playlist:5xddIVAtLrZKtt4YGLM1SQ | playlist
-| YouTube | 837 | youtu.be/6ZMXE5PXPqU | 6ZMXE5PXPqU | live
-
 ## Actions
+
+The integration exposes actions to give additional control over a Roku device.
 
 ### Action `roku.search`
 
