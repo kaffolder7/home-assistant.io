@@ -97,7 +97,7 @@ In the official Bloc Blinds app go to settings (three bars > gear icon), go to t
 
 ### 3 Day Blinds app
 
-In the 3 Day Blinds App go to the home screen, go to settings (three bars in the upper left corner> gear icon), select “About” from the bottom, quickly tap the 3 Day Blinds icon in the center of the screen 5 times and a pop-up with the key will be shown.
+In the 3 Day Blinds app go to the home screen, go to settings (three bars in the upper left corner > gear icon), select `About` from the bottom, quickly tap the 3 Day Blinds icon in the center of the screen 5 times and a pop-up with the key will be shown.
 
 ### Connector app
 
