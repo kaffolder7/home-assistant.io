@@ -254,3 +254,15 @@ This action allows you to emulate opening the search screen and entering the sea
 | ---------------------- | -------- | ----------- | ------- |
 | `entity_id` | yes | The entities to search on. | media_player.roku
 | `keyword` | no | The keyword to search for. | Space Jam
+
+## Known Limitations
+
+This integration only supports Roku media playback devices (ie sticks, streaming boxes, and televisions). All other smarthome products (ie light bulbs and cameras) are part of a different ecosystem.
+
+Roku channels, such as YouTube, are maintained by third-parties and as such the availability of features like Content Deeplinking are subject to change without notice.
+
+## Remove integration
+
+This integration can be removed by following these steps:
+
+{% include integrations/remove_device_service.md %}
